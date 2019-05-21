@@ -1,0 +1,64 @@
+-
+  name: Install dependecies
+  hosts: rpis
+  tasks:
+    -
+      name: install matchbox-keyboard
+      become: yes
+      apt:
+        name: matchbox-keyboard
+        state: present
+    -
+      name: install sqlite3
+      become: yes
+      apt:
+        name: sqlite3
+        state: present
+    -
+      name: Clone git repository
+      git:
+        repo: "https://github.com/Reverendheat/apt-floorlocation-python.git"
+        dest: /home/pi/aptfloorlocationpython
+    -
+      name: Edit crontab for heartbeat
+      become: yes
+      cron:
+        name: Add heartbeat
+        minute: "*/1"
+        job: "sudo /home/pi/aptfloorlocationpython/export.sh >> /home/pi/export.log && /home/pi/aptfloorlocationpython/heartbeat.py"
+    -
+      name: Edit crontab for wireless
+      become: yes
+      cron:
+        name: Add wireless check
+        minute: "*/2"
+        job: "sudo /home/pi/aptfloorlocationpython/wlanMonitor.sh >>/home/pi/wlanMonitor.log"
+    -
+      name: Edit bashrc to start program automagically
+      become: yes
+      blockinfile:
+        path: /home/pi/.bashrc
+        insertafter: EOF
+        block: |
+          echo Starting Floor Inventory Application
+          sudo python3 /home/pi/aptfloorlocationpython/APTFloorLocation.py
+    -
+      name: Change the font size
+      become: yes
+      lineinfile:
+        path: /etc/default/console-setup
+        state: present
+        regexp: 'FONTSIZE=""'
+        line: FRONTSIZE="16x32"
+    -
+      name: Change the font face
+      become: yes
+      lineinfile:
+        path: /etc/default/console-setup
+        state: present
+        insertafter: 'FONTFACE="'
+        line: Terminus
+    -
+      name: Reboot all pi's
+      become: yes
+      reboot: 
