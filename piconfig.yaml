@@ -45,20 +45,18 @@
     -
       name: Change the font size
       become: yes
-      lineinfile:
+      replace:
         path: /etc/default/console-setup
-        state: present
-        regexp: 'FONTSIZE=""'
-        line: FRONTSIZE="16x32"
+        regexp: FONTSIZE=""
+        replace: FONTSIZE="16x32"
     -
       name: Change the font face
       become: yes
-      lineinfile:
+      replace:
         path: /etc/default/console-setup
-        state: present
-        insertafter: 'FONTFACE="'
-        line: Terminus
-    -
-      name: Reboot all pi's
-      become: yes
-      reboot: 
+        regexp: FONTFACE=""
+        replace: FONTFACE="Terminus"
+    # -
+    #   name: Reboot all pi's
+    #   become: yes
+    #   reboot: 
