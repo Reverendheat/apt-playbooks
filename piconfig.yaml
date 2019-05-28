@@ -15,6 +15,23 @@
         name: sqlite3
         state: present
     -
+      name: install odbc tools for pyodbc
+      become: yes
+      apt:
+        name: unixodbc-dev
+        state: present
+    -
+      name: pip3 install urwid
+      become: yes
+      pip:
+        name: urwid
+        executable: pip3
+    -
+      name: pip3 install pyodbc
+      pip:
+        name: pyodbc
+        executable: pip3
+    -
       name: Clone git repository
       git:
         repo: "https://github.com/Reverendheat/apt-floorlocation-python.git"
