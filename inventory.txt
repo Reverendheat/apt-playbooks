@@ -1,4 +1,0 @@
-#Rasberry Pi's
-[rpis]
-#APTPIDEV ansible_host=10.51.4.26 ansible_ssh_user=pi
-APTPIF ansible_host=10.51.4.129 ansible_ssh_user=pi
