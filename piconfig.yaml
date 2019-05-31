@@ -22,7 +22,6 @@
         state: present
     -
       name: pip3 install urwid
-      become: yes
       pip:
         name: urwid
         executable: pip3
@@ -42,7 +41,7 @@
       cron:
         name: Add heartbeat
         minute: "*/1"
-        job: "sudo /home/pi/aptfloorlocationpython/export.sh >> /home/pi/export.log && /home/pi/aptfloorlocationpython/heartbeat.py"
+        job: "sudo /home/pi/aptfloorlocationpython/export.sh >> /home/pi/export.log && python3 /home/pi/aptfloorlocationpython/heartbeat.py"
     -
       name: Edit crontab for wireless
       become: yes
@@ -74,16 +73,21 @@
         regexp: FONTFACE=""
         replace: FONTFACE="Terminus"
     -
-      name: Add wireless SSID Floor Location
+      name: Change hostname
       become: yes
-      blockinfile:
-        path: /etc/wpa_supplicant/wpa_supplicant.conf
-        insertafter: EOF
-        block: |
-          network={
-            ssid="APT Floor Location"
-            psk=""
-          }
+      hostname:
+        name: APTPIF
+    -
+      name: Add wireless SSIDs
+      become: yes
+      copy: src=./wpa_supplicant.conf dest=/etc/wpa_supplicant/wpa_supplicant.conf mode=0600
+    -
+      name: Add public RSA Key
+      become: yes
+      authorized_key:
+        user: pi
+        state: present
+        key: "{{ lookup('file', '/home/parakoopa/.ssh/id_rsa.pub') }}"
     -
       name: Reboot all pi's
       become: yes
