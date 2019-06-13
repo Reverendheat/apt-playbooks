@@ -1,4 +1,8 @@
 #Rasberry Pi's
 [rpis]
 #APTPIDEV ansible_host=10.51.4.26 ansible_ssh_user=pi
-APTPIF ansible_host=10.51.4.129 ansible_ssh_user=pi
+#APTPIF ansible_host=10.51.4.129 ansible_ssh_user=pi
+#FLCDEMO ansible_host=10.79.4.48 ansible_ssh_user=pi ansible_become_pass=APT.734!!
+APTPIH ansible_host=10.51.4.170 ansible_ssh_user=pi ansible_become_pass=APT.734!!
+APTPIG ansible_host=10.51.4.173 ansible_ssh_user=pi ansible_become_pass=APT.734!!
+APTPII ansible_host=10.51.4.154 ansible_ssh_user=pi ansible_become_pass=APT.734!!

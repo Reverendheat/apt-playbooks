@@ -3,23 +3,20 @@
   hosts: rpis
   tasks:
     -
-      name: install matchbox-keyboard
+      name: Install apt dependencies
       become: yes
       apt:
-        name: matchbox-keyboard
-        state: present
-    -
-      name: install sqlite3
-      become: yes
-      apt:
-        name: sqlite3
-        state: present
-    -
-      name: install odbc tools for pyodbc
-      become: yes
-      apt:
-        name: unixodbc-dev
-        state: present
+        name: "{{ packages }}"
+      vars:
+        packages:
+          - matchbox-keyboard
+          - sqlite3
+          - unixodbc
+          - unixodbc-dev
+          - freetds-dev
+          - tdsodbc
+          - freetds-bin
+          - python-pyodbc
     -
       name: pip3 install urwid
       pip:
@@ -29,6 +26,11 @@
       name: pip3 install pyodbc
       pip:
         name: pyodbc
+        executable: pip3
+    -
+      name: pip3 install dotenv
+      pip:
+        name: python-dotenv
         executable: pip3
     -
       name: Clone git repository
@@ -50,21 +52,21 @@
         minute: "*/2"
         job: "sudo /home/pi/aptfloorlocationpython/wlanMonitor.sh >>/home/pi/wlanMonitor.log"
     -
-      name: Edit bashrc to start program automagically
+      name: Edit bashrc to start program on logon
       become: yes
       blockinfile:
         path: /home/pi/.bashrc
         insertafter: EOF
         block: |
           echo Starting Floor Inventory Application
-          sudo python3 /home/pi/aptfloorlocationpython/APTFloorLocation.py
+          python3 /home/pi/aptfloorlocationpython/APTFloorLocation.py
     -
       name: Change the font size
       become: yes
       replace:
         path: /etc/default/console-setup
         regexp: FONTSIZE=""
-        replace: FONTSIZE="16x32"
+        replace: FONTSIZE="14x28"
     -
       name: Change the font face
       become: yes
@@ -72,15 +74,43 @@
         path: /etc/default/console-setup
         regexp: FONTFACE=""
         replace: FONTFACE="Terminus"
-    -
-      name: Change hostname
-      become: yes
-      hostname:
-        name: APTPIF
+    # -
+    #   name: Change hostname
+    #   become: yes
+    #   hostname:
+    #     name: APTPIF
     -
       name: Add wireless SSIDs
       become: yes
-      copy: src=./wpa_supplicant.conf dest=/etc/wpa_supplicant/wpa_supplicant.conf mode=0600
+      copy:
+        backup: yes
+        src: ./wpa_supplicant.conf 
+        dest: /etc/wpa_supplicant/wpa_supplicant.conf
+        mode: '0600'
+    -
+      name: Add FreeTDS Conf
+      become: yes
+      copy: 
+        backup: yes
+        src: ./freetds.conf
+        dest: /etc/freetds/freetds.conf
+        mode: '0644'
+    -
+      name: Add ODBC ini
+      become: yes
+      copy:
+        backup: yes
+        src: ./odbc.ini
+        dest: /etc/odbc.ini
+        mode: '0644'
+    -
+      name: Add ODBCINST ini
+      become: yes
+      copy:
+        backup: yes
+        src: ./odbcinst.ini 
+        dest: /etc/odbcinst.ini
+        mode: '0644'
     -
       name: Add public RSA Key
       become: yes
