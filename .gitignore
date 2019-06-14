@@ -1,3 +1,4 @@
 *.conf
 *.txt
 *.ini
+*.env

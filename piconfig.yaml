@@ -112,6 +112,14 @@
         dest: /etc/odbcinst.ini
         mode: '0644'
     -
+      name: Add dotenv file
+      become: yes
+      copy:
+        backup: yes
+        src: ./.env 
+        dest: /home/pi/aptfloorlocationpython/
+        mode: '0644'
+    -
       name: Add public RSA Key
       become: yes
       authorized_key:
