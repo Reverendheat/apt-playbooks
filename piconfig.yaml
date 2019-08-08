@@ -6,6 +6,7 @@
       name: Install apt dependencies
       become: yes
       apt:
+        update_cache: yes
         name: "{{ packages }}"
       vars:
         packages:
@@ -38,12 +39,12 @@
         repo: "https://github.com/Reverendheat/apt-floorlocation-python.git"
         dest: /home/pi/aptfloorlocationpython
     -
-      name: Edit crontab for heartbeat
+      name: Edit crontab for exports
       become: yes
       cron:
-        name: Add heartbeat
+        name: Add exports
         minute: "*/1"
-        job: "sudo /home/pi/aptfloorlocationpython/export.sh >> /home/pi/export.log && python3 /home/pi/aptfloorlocationpython/heartbeat.py"
+        job: "sudo /home/pi/aptfloorlocationpython/export.sh >> /home/pi/export.log && sudo /home/pi/aptfloorlocationpython/exportwipfl.sh >> /home/pi/exportwipfl.log"
     -
       name: Edit crontab for wireless
       become: yes
@@ -51,6 +52,13 @@
         name: Add wireless check
         minute: "*/2"
         job: "sudo /home/pi/aptfloorlocationpython/wlanMonitor.sh >>/home/pi/wlanMonitor.log"
+    -
+      name: Edit crontab for catalog download
+      become: yes
+      cron:
+        name: Add wireless check
+        minute: "*/10"
+        job: "sudo smbget -u=aptinc/FLocations -p=APT.248.YEAH.BOI smb://NEWMAS/FloorLocations/bindata/BinDatQty.csv -o=/home/pi/aptfloorinventorypython/BinDataQty.csv"
     -
       name: Edit bashrc to start program on logon
       become: yes
@@ -74,11 +82,11 @@
         path: /etc/default/console-setup
         regexp: FONTFACE=""
         replace: FONTFACE="Terminus"
-    # -
-    #   name: Change hostname
-    #   become: yes
-    #   hostname:
-    #     name: APTPIF
+    -
+      name: Change hostname
+      become: yes
+      hostname:
+        name: APTPIF
     -
       name: Add wireless SSIDs
       become: yes
@@ -129,4 +137,4 @@
     -
       name: Reboot all pi's
       become: yes
-      reboot: 
+      reboot:
