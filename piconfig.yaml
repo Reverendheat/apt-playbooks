@@ -39,6 +39,12 @@
         repo: "https://github.com/Reverendheat/apt-floorlocation-python.git"
         dest: /home/pi/aptfloorlocationpython
     -
+      name: remove crontab for heartbeart
+      become: yes
+      cron:
+        name: Add heartbeat
+        state: absent
+    -
       name: Edit crontab for exports
       become: yes
       cron:
@@ -58,7 +64,7 @@
       cron:
         name: Add wireless check
         minute: "*/10"
-        job: "sudo smbget -u=aptinc/FLocations -p=APT.248.YEAH.BOI smb://NEWMAS/FloorLocations/bindata/BinDatQty.csv -o=/home/pi/aptfloorinventorypython/BinDataQty.csv"
+        job: "sudo wget -q -P /home/pi/aptfloorlocationpython/BinDataQty.csv ftp://raspberrypi:Toys.In.Bins.Or.Boxes@NEWMAS/bindata/BinDataQty.csv"
     -
       name: Edit bashrc to start program on logon
       become: yes
@@ -82,11 +88,11 @@
         path: /etc/default/console-setup
         regexp: FONTFACE=""
         replace: FONTFACE="Terminus"
-    -
-      name: Change hostname
-      become: yes
-      hostname:
-        name: APTPIF
+    # -
+    #   name: Change hostname
+    #   become: yes
+    #   hostname:
+    #     name: APTPIF
     -
       name: Add wireless SSIDs
       become: yes

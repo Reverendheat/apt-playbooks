@@ -1,0 +1,40 @@
+-
+  name: Clone(install) or Update program
+  hosts: rpis
+  tasks:
+    -
+      name: Clone git repository
+      git:
+        repo: "https://github.com/Reverendheat/apt-floorlocation-python.git"
+        dest: /home/pi/aptfloorlocationpython
+    -
+      name: remove crontab for heartbeart
+      become: yes
+      cron:
+        name: Add heartbeat
+        state: absent
+    -
+      name: Edit crontab for exports
+      become: yes
+      cron:
+        name: Add exports
+        minute: "*/1"
+        job: "sudo /home/pi/aptfloorlocationpython/export.sh >> /home/pi/export.log && sudo /home/pi/aptfloorlocationpython/exportwipfl.sh >> /home/pi/exportwipfl.log"
+    -
+      name: Edit crontab for wireless
+      become: yes
+      cron:
+        name: Add wireless check
+        minute: "*/2"
+        job: "sudo /home/pi/aptfloorlocationpython/wlanMonitor.sh >>/home/pi/wlanMonitor.log"
+    -
+      name: Edit crontab for catalog download
+      become: yes
+      cron:
+        name: Add wireless check
+        minute: "*/10"
+        job: "sudo wget -P /home/pi/aptfloorlocationpython/ ftp://raspberrypi:Toys.In.Bins.Or.Boxes@NEWMAS/bindata/BinDataQty.csv"
+    -
+      name: Reboot all pi's
+      become: yes
+      reboot:
