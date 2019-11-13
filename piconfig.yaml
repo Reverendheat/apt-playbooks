@@ -38,12 +38,17 @@
       git:
         repo: "https://github.com/Reverendheat/apt-floorlocation-python.git"
         dest: /home/pi/aptfloorlocationpython
+    - 
+      name: remove crontab
+      become: yes
+      shell: if [-f "/var/spool/cron/crontabs/root"]; then crontab -r; else:; fi; 
     -
-      name: remove crontab for heartbeart
+      name: Edit crontab for heartbeat
       become: yes
       cron:
         name: Add heartbeat
-        state: absent
+        minute: "*/1"
+        job: "sudo python3 /home/pi/aptfloorlocationpython/heartbeat.py >> /home/pi/heartbeat.log"      
     -
       name: Edit crontab for exports
       become: yes
@@ -62,9 +67,9 @@
       name: Edit crontab for catalog download
       become: yes
       cron:
-        name: Add wireless check
+        name: add catalog download
         minute: "*/10"
-        job: "sudo wget -q -P /home/pi/aptfloorlocationpython/BinDataQty.csv ftp://raspberrypi:Toys.In.Bins.Or.Boxes@NEWMAS/bindata/BinDataQty.csv"
+        job: "if test -f /home/pi/aptfloorlocationpython/BinDataQty.csv; then sudo rm /home/pi/aptfloorlocationpython/BinDataQty.csv; fi && sudo wget -q -P /home/pi/aptfloorlocationpython/ ftp://raspberrypi:Toys.In.Bins.Or.Boxes@NEWMAS/bindata/BinDataQty.csv"
     -
       name: Edit bashrc to start program on logon
       become: yes
@@ -74,6 +79,12 @@
         block: |
           echo Starting Floor Inventory Application
           python3 /home/pi/aptfloorlocationpython/APTFloorLocation.py
+    -
+      name: Create wipcsv if it does not exist
+      file:
+        path: /home/pi/wipcsv
+        state: directory
+        mode: '0777'
     -
       name: Change the font size
       become: yes
@@ -88,11 +99,11 @@
         path: /etc/default/console-setup
         regexp: FONTFACE=""
         replace: FONTFACE="Terminus"
-    # -
-    #   name: Change hostname
-    #   become: yes
-    #   hostname:
-    #     name: APTPIF
+    -
+      name: Change hostname
+      become: yes
+      hostname:
+        name: "{{ inventory_hostname }}"
     -
       name: Add wireless SSIDs
       become: yes
